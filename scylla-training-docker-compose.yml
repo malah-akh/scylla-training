@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+
+  scylla-node1:
+    container_name: scylla-node1
+    image: scylladb/scylla:latest
+    restart: always
+    command: --seeds=scylla-node1,scylla-node2 --smp 1 --memory 750M --overprovisioned 1 --api-address 0.0.0.0
+    volumes:
+      - "${PWD}/scylla/scylla.yaml:/etc/scylla/scylla.yaml"
+      - "${PWD}/scylla/cassandra-rack.dc1-a.properties:/etc/scylla/cassandra-rackdc.properties"
+      - "${PWD}/scylla/mutant-data.txt:/mutant-data.txt"
+    networks:
+      web:
+
+  scylla-node2:
+    container_name: scylla-node2
+    image: scylladb/scylla:latest
+    restart: always
+    command: --seeds=scylla-node1,scylla-node2 --smp 1 --memory 750M --overprovisioned 1 --api-address 0.0.0.0
+    volumes:
+      - "${PWD}/scylla/scylla.yaml:/etc/scylla/scylla.yaml"
+      - "${PWD}/scylla/cassandra-rack.dc1-b.properties:/etc/scylla/cassandra-rackdc.properties"
+    networks:
+      web:
+
+  scylla-node3:
+    container_name: scylla-node3
+    image: scylladb/scylla:latest
+    restart: always
+    command: --seeds=scylla-node1,scylla-node2 --smp 1 --memory 750M --overprovisioned 1 --api-address 0.0.0.0
+    volumes:
+      - "${PWD}/scylla/scylla.yaml:/etc/scylla/scylla.yaml"
+      - "${PWD}/scylla/cassandra-rack.dc1-c.properties:/etc/scylla/cassandra-rackdc.properties"
+    networks:
+      web:
+
+  scylla-new-dc:
+    container_name: scylla-new-dc
+    image: scylladb/scylla:latest
+    restart: always
+    command: --seeds=scylla-node1,scylla-node2 --smp 3 --memory 2250M --overprovisioned 1 --api-address 0.0.0.0
+    volumes:
+      - "${PWD}/scylla/scylla.yaml:/etc/scylla/scylla.yaml"
+      - "${PWD}/scylla/cassandra-rackdc.properties.dc2:/etc/scylla/cassandra-rackdc.properties"
+    networks:
+      web:
+
+  # scylla-replace-new-node:
+  #   container_name: scylla-replace-new-node
+  #   image: scylladb/scylla:latest
+  #   restart: always
+  #   command: --seeds=scylla-node1,scylla-node2 --smp 1 --memory 750M --overprovisioned 1 --api-address 0.0.0.0
+  #   volumes:
+  #     - "${PWD}/scylla/scylla.yaml:/etc/scylla/scylla.yaml"
+  #     - "${PWD}/scylla/cassandra-rack.dc1-c.properties:/etc/scylla/cassandra-rackdc.properties"
+  #   networks:
+  #     web:
+
+networks:
+  web:
+    driver: bridge
